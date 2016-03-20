@@ -1,5 +1,5 @@
 CXX=g++
-CXX_FLAGS=-std=c++11 -O2 -Wall -Wextra -Wshadow -g
+CXX_FLAGS=-std=c++11 -O2 -march=native -mtune=native -Wall -Wextra -Wshadow
 
 satsolve: build/satsolve.o build/SatSolver.o
 	$(CXX) $(CXX_FLAGS) -o satsolve build/satsolve.o build/SatSolver.o
