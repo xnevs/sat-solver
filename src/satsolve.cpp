@@ -157,19 +157,35 @@ int choose() {
     return *unsimplified.begin();
 }
 
-bool dpll() {
+struct ChangesList {
     vector<int> simplified;
+
+    ~ChangesList() {
+        for(auto it=simplified.rbegin(); it!=simplified.rend(); it++) {
+            int lit = *it;
+            unsimplify(lit);
+            units.insert(lit);
+        }
+    }
+
+    void add(int lit) {
+        simplified.push_back(lit);
+    }
+};
+
+bool dpll() {
+    ChangesList changes;
     while(!units.empty()) {
         int lit = *units.begin();
-        simplified.push_back(lit);
+        changes.add(lit);
         units.erase(lit);
 
         if(!simplify(lit))
-            goto fail;
+            return false;
     }
-    
+
     if(unsatisfied == 0) {
-        for(auto i : simplified) cout << i << endl;
+        for(auto i : changes.simplified) cout << i << endl;
         return true;
     }
 
@@ -178,25 +194,19 @@ bool dpll() {
 
     found_unit(chosen);
     if(dpll()) {
-        for(auto i : simplified) cout << i << endl;
+        for(auto i : changes.simplified) cout << i << endl;
         return true;
     }
     destroyed_unit(chosen);
     
     found_unit(-chosen);
     if(dpll()) {
-        for(auto i : simplified) cout << i << endl;
+        for(auto i : changes.simplified) cout << i << endl;
         return true;
     }
     destroyed_unit(-chosen);
     }
 
-  fail:
-    for(auto it=simplified.rbegin(); it!=simplified.rend(); it++) {
-        int lit = *it;
-        unsimplify(lit);
-        units.insert(lit);
-    }
     return false;
 }
 
