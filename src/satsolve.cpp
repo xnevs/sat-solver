@@ -120,6 +120,7 @@ bool simplify(int lit) {
                 found_unit(*formula[clause].begin());
             }
             if(formula[clause].size() == 0) {
+                destroyed_unit(-1*lit);
                 return false;
             }
         }
@@ -161,7 +162,8 @@ bool dpll() {
     while(!units.empty()) {
         int lit = *units.begin();
         simplified.push_back(lit);
-        destroyed_unit(lit);
+        units.erase(lit);
+
         if(!simplify(lit))
             goto fail;
     }
@@ -193,7 +195,7 @@ bool dpll() {
     for(auto it=simplified.rbegin(); it!=simplified.rend(); it++) {
         int lit = *it;
         unsimplify(lit);
-        found_unit(lit);
+        units.insert(lit);
     }
     return false;
 }
