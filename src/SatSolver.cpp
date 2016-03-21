@@ -126,13 +126,11 @@ bool SatSolver::simplify(int lit) {
             }
             if(formula[clause].size() == 0) {
                 destroyed_unit(-1*lit);
-                //return false;
                 ok = false;
             }
         }
     }
 
-    //return true;
     return ok;
 }
 
