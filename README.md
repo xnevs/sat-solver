@@ -13,9 +13,9 @@ The result of building is the `satsolver` executable.
 Running
 -------
 
-To run the solver on a DIMACS formatted input file (e.g. `dimacs/sudoku1.txt`) run `./satsolver` with the filename as the only argument.
+To run the solver on a DIMACS formatted input file (e.g. `example.txt`) run `./satsolver` with the filename as the only argument.
 ```
-./satsolver dimacs/sudoku1.txt
+./satsolver example.txt
 ```
 
 The program will print a satisfying valuation to standard output or print `The formula in NOT satisfiable.` if there is none.
