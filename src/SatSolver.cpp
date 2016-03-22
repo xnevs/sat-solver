@@ -83,7 +83,7 @@ bool SatSolver::solve() {
             return false;
     }
 
-    //if all clauses satisfied, we have found a satisfyin valuation
+    //if all clauses satisfied, we have found a satisfying valuation
     if(unsatisfied == 0) {
         for(auto i : changes.simplified) solution.push_back(i);
         return true;
@@ -205,7 +205,7 @@ void SatSolver::destroyed_unit(int lit) {
 }
 
 /* This function increases the number of satisfied
- * literals appearin in the clause clause.
+ * literals appearing in the clause clause.
  */
 void SatSolver::satisfy(int clause) {
     int cnt = satisfied_count[clause] + 1;
