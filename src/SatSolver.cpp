@@ -12,19 +12,15 @@ using namespace std;
 void SatSolver::read_dimacs(istream &in) {
     int nbvar,nbclauses;
 
-    //ignore comments
     while(in.peek() == 'c') {
         in.ignore(numeric_limits<streamsize>::max(), '\n');
     }
-    //ignore "p"
     in.ignore(numeric_limits<streamsize>::max(), ' ');
-    //ignore "cnf"
     in.ignore(numeric_limits<streamsize>::max(), ' ');
 
-    //read number of vars and clauses
     in >> nbvar >> nbclauses;
 
-    formula.resize(nbclauses+1); //one redundant clause at the beginning, does not count as an empty clause
+    formula.resize(nbclauses+1);
     vars.resize(nbvar+1);
 
     for(int i=1; i<=nbvar; i++) {
@@ -32,7 +28,6 @@ void SatSolver::read_dimacs(istream &in) {
     }
     unsatisfied = nbclauses;
 
-    //read formula
     int clause = 1;
     int literal;
     while(in >> literal) {
@@ -50,6 +45,9 @@ void SatSolver::read_dimacs(istream &in) {
 }
 
 
+/* ChangesList records simplified variables in the current call of solve().
+ * The destructor reverts the changes when the solve() function returns.
+ */
 struct ChangesList {
     SatSolver * solver;
     vector<int> simplified;
@@ -68,8 +66,14 @@ struct ChangesList {
         simplified.push_back(lit);
     }
 };
+
+/* The main function of the DPLL algorithm.
+ */
 bool SatSolver::solve() {
+    //create the object to record changes
     ChangesList changes(this);
+
+    //simplify
     while(!units.empty()) {
         int lit = *units.begin();
         changes.add(lit);
@@ -79,15 +83,18 @@ bool SatSolver::solve() {
             return false;
     }
 
+    //if all clauses satisfied, we have found a satisfyin valuation
     if(unsatisfied == 0) {
         for(auto i : changes.simplified) solution.push_back(i);
         return true;
     }
     
+    //else choose an unsatisfied variable
     int chosen = choose();
     if(chosen == 0)
         return false;
 
+    //declare the chosen variable true
     found_unit(chosen);
     if(solve()) {
         for(auto i : changes.simplified) solution.push_back(i);
@@ -95,6 +102,7 @@ bool SatSolver::solve() {
     }
     destroyed_unit(chosen);
     
+    //declare the chosen variable false
     found_unit(-chosen);
     if(solve()) {
         for(auto i : changes.simplified) solution.push_back(i);
@@ -102,10 +110,13 @@ bool SatSolver::solve() {
     }
     destroyed_unit(-chosen);
 
+    //no satisfying valuation exists
     return false;
 }
 
 
+/* Simplify all clauses the literal lit appears in.
+ */
 bool SatSolver::simplify(int lit) {
     int sign = (lit > 0 ? 1 : -1);
     int var = sign * lit;
@@ -134,6 +145,9 @@ bool SatSolver::simplify(int lit) {
     return ok;
 }
 
+/* Revert the clauses simplifed in the call of
+ * simplify(lit).
+ */
 void SatSolver::unsimplify(int lit) {
     int sign = (lit > 0 ? 1 : -1);
     int var = sign * lit;
@@ -158,6 +172,8 @@ void SatSolver::unsimplify(int lit) {
     }
 }
 
+/* Choose an unsimplified variable
+ */
 int SatSolver::choose() {
     if(unsimplified.empty())
         return 0;
@@ -165,6 +181,10 @@ int SatSolver::choose() {
         return *unsimplified.begin();
 }
 
+/* This function increases the counter of unit clauses
+ * the literal lit appears in.
+ * If the counter becomes 1 add lit to the queue of units.
+ */
 void SatSolver::found_unit(int lit) {
     int cnt = unit_count[lit] + 1;
     if(cnt == 1)
@@ -172,6 +192,10 @@ void SatSolver::found_unit(int lit) {
     unit_count[lit] = cnt;
 }
 
+/* This function decreases that counter and
+ * possibly removes a literal from the queue
+ * of units.
+ */
 void SatSolver::destroyed_unit(int lit) {
     int cnt = unit_count[lit] - 1;
     if(cnt == 0) {
@@ -180,6 +204,9 @@ void SatSolver::destroyed_unit(int lit) {
     unit_count[lit] = cnt;
 }
 
+/* This function increases the number of satisfied
+ * literals appearin in the clause clause.
+ */
 void SatSolver::satisfy(int clause) {
     int cnt = satisfied_count[clause] + 1;
     if(cnt == 1) {
@@ -188,6 +215,8 @@ void SatSolver::satisfy(int clause) {
     satisfied_count[clause] = cnt;
 }
 
+/* This function reverts satisfy().
+ */
 void SatSolver::unsatisfy(int clause) {
     int cnt = satisfied_count[clause] -1;
     if(cnt == 0) {
