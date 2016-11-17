@@ -13,7 +13,7 @@ The result of building is the `satsolver` executable.
 Running
 -------
 
-To run the solver on a DIMACS formatted input file (e.g. `example.txt`) run `./satsolver` with the filename as the only argument.
+To run the solver on a DIMACS formatted input file (e.g. `example.txt`) run `./satsolve` with the filename as the only argument.
 ```
 ./satsolve example.txt
 ```
