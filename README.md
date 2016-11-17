@@ -15,7 +15,7 @@ Running
 
 To run the solver on a DIMACS formatted input file (e.g. `example.txt`) run `./satsolver` with the filename as the only argument.
 ```
-./satsolver example.txt
+./satsolve example.txt
 ```
 
 The program will print a satisfying valuation to standard output or print `The formula in NOT satisfiable.` if there is none.
