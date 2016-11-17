@@ -8,7 +8,7 @@ A C++ compiler with C++11 support is required. The default compiler is `g++`. If
 
 To build the project run `make` in the root directory of the project.
 
-The result of building is the `satsolver` executable.
+The result of building is the `satsolve` executable.
 
 Running
 -------
